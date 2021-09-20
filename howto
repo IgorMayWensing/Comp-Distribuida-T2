@@ -7,11 +7,12 @@ Sem o gnome-terminal instalado execute manualmente:
 
 python3 node.py <porta>
 
-Exemplo com cinco nodos:
+Exemplo com seis nodos:
 
 python3 node.py 9000
 python3 node.py 9001
 python3 node.py 9002
 python3 node.py 9003
 python3 node.py 9004
+python3 node.py 9005
 

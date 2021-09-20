@@ -11,7 +11,7 @@ leader = -1
 isParticipant = False
 pid = int(sys.argv[1])
 print('Processo PID: ' + sys.argv[1])
-dest = ('localhost', (pid + 1) % 5 + 9000)
+dest = ('localhost', (pid + 1) % 6 + 9000)
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 r.bind(('0.0.0.0', pid))
 r.listen(1)
@@ -42,7 +42,7 @@ def find_node():
         except ConnectionRefusedError:
             if attempt == 0:
                 attempt = 3
-                dest = ('localhost', (dest[1] + 1) % 5 + 9000)
+                dest = ('localhost', (dest[1] + 1) % 6 + 9000)
             else:
                 time.sleep(1)
                 attempt -= 1
@@ -80,11 +80,11 @@ def listen():
             res = data.decode('UTF-8')
             op = res.split(' ')
 
-            if op[0] != 'hc':
+            if res[:2] != 'hc':
                 print('Mensagem recebida: ' + res)
             if op[0] == 'hl':
                 if not isLeader:
-                    if pid != int(op[1]):
+                    if str(pid) != op[1]:
                         send_message(res)
                     else:
                         print("MEU DEUS, O LÍDER MORREU!")
@@ -93,22 +93,22 @@ def listen():
                         print("Nova eleição iniciada")
             elif op[0] == 'el':
                 # Round 1
-                if int(op[2]) == pid:
+                if op[2] == str(pid):
                     leader = int(op[1])
                     isParticipant = False
                     if leader == pid:
                         isLeader = True
                     send_message('r2 ' + op[1] + ' ' + str(pid))
                     show_info()
-                elif int(op[1]) > pid:
+                elif op[1] > str(pid):
                     isParticipant = True
                     send_message(res)
                     print("Definindo novo potencial líder")
-                elif int(op[1]) < pid and not isParticipant:
+                elif op[1] < str(pid) and not isParticipant:
                     isParticipant = True
                     send_message('el ' + str(pid) + ' ' + op[2])
                     print("Propagando pontencial líder")
-            elif op[0] == 'r2' and int(op[2]) != pid:
+            elif op[0] == 'r2' and op[2] != str(pid):
                 # Round 2
                 leader = int(op[1])
                 isParticipant = False
